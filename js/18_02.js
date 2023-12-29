@@ -1,29 +1,13 @@
-let itemList = [];      // 商品一覧
+let itemList = [];
+// 商品一覧
 
 //--- データの定義 ---
 // 大分類
-let cate1 = [
-  '---',                  // 未選択
-  '家具',
-  'ベッド・マットレス',
-  '収納家具・収納グッズ',
-  '子ども家具'
-];
-
+let cate1 = [];
+ 
 // 小分類
-let cate2 = [
-  // 未選択
-  ['---','ベッド','ソファ','棚・ラック','テーブル・椅子','寝具','マットレス', '家具・ラック','収納システム', '子ども部屋家具','ベビー家具・ベビーグッズ'],
-  // 家具のカテゴリ
-  ['---','ベッド','ソファ','棚・ラック','テーブル・椅子'],
-  // ベッド・マットレスのカテゴリ
-  ['---', 'ベッド','寝具','マットレス'],
-  // 収納家具・収納グッズ'のカテゴリ
-  ['---', '家具・ラック','収納システム'],
-  // 子ども家具
-  ['---', '子ども部屋家具','ベビー家具・ベビーグッズ']
-];
-
+let cate2 = [];
+ 
 
 //--- 共通で使用する要素を取得 ---
 // 大分類のselectをid属性により取得
@@ -124,13 +108,23 @@ cate2Element.addEventListener('change', function(){
     viewItemList(val);
 });
 
+// 商品一覧をファイルから取得
 $(function () {
     $.ajax({
         url: 'json/item.json',
         dataType: 'json'
     })
     .done(function (data) {
-        itemList = data;
+        var data_stringify = JSON.stringify(data);
+        var data_json = JSON.parse(data_stringify);
+       
+        
+        itemList = data_json[0].itemList;
+        // console.log(data_json[0].itemList);
+        cate1 = data_json[1].cate1;
+        
+        cate2 = data_json[2].cate2;
+        
         // 大分類の生成
         setMainMenu(); 
     })
@@ -138,49 +132,3 @@ $(function () {
         alert("ファイルが読み込めませんでした");
     });
 });
-
-function isSearchItem(item, cate1, cate2, cate3) {
-       var isHit = false;
-	// 大分類のみが指定されている場合
-	   if (cate1 !== '---' && cate2 === '---' && cate3 === '---') {
-	     if (item.tags1.some(t => t === cate1)) {
-	         isHit = true;
-	     }
-	   }
-	// 小分類のみが指定されている場合
-	   if (cate1 === '---' && cate2 !== '---' && cate3 === '---') {
-	     if (item.tags2.some(t => t === cate2)) {
-	         isHit = true;
-	     }
-	   }
-	// 大分類、小分類が指定されている場合
-	   if (cate1 !== '---' && cate2 !== '---' && cate3 === '---') {
-	     if (item.tags1.some(t => t === cate1) && item.tags2.some(t => t === cate2)) {
-	         isHit = true;
-	     }
-	   }
-	   
-	   if (cate1 !== '---' && cate2 !== '---' && cate3 !== '---') {
-	     if (item.tags1.some(t => t === cate1) && item.tag2.some(t => t === cate2) && item.tag3.some(t => t === cate3)) {
-	         isHit = true;
-	     }
-	   }
-	   
-	   if (cate1 !== '---' && cate2 === '---' && cate3 !== '---') {
-	     if (item.tag1.some(t => t === cate1) && item.tag3.some(t => t === cate3)) {
-	         isHit = true;
-	     }    
-	   }
-	   
-	   if (cate1 === '---' && cate2 !== '---' && cate3 !== '---') {
-	     if (item.tag2.some(t => t === cate2) && item.tag3.some(t => t === cate3)) {
-	         isHit = true;
-	     }    
-	   }
-	// 大分類、小分類が未指定の場合、必ずtrueを辺返却
-	   if (cate1 === '---' && cate2 === '---' && cate3 === '---') {
-	     isHit = true;
-	   }
-	// 見つかった場合はtrue, 見つからない場合はfalse
-	return isHit; 
-}
